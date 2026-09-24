@@ -26,12 +26,22 @@ GND           GND
 
 4. flashed the code in the esp32 that fetchs from the google document.
 
+So, at the moment, it successfully reads the NFCs and shows on the Serial Monitor the information about the different members.
+-----------------------------------------------------------------------------------------------------------
+
 Next steps.
-1. Graham should:
-go to Apps Scrip in extension of the fablab google document and apply the code found in AppsScript_doGet.gs
-Then copy the link into the .ino file.
+Graham:
+open the Apps Scrip (in extensions) of the fablab's google document and apply the code found in AppsScript_doGet.gs
+The google document should match the column names:
+UID	Name	Onboarding	Laser	Cnc	Bambu
 
-Best if the file just matches the column names as in the example file.
+Code:
+The .ino file should be updated to the one new App Script.
+Adding a UI tbat communicates with an encoder/buttons and screen.
 
-2. Hardware setup:
-Install a screen to display the info (right now it shows on the Serial Monitor)
+Hardware:
+Install the screen and buttons 
+
+Other:
+3d case
+3d design for NFCs
