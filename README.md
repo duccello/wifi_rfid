@@ -7,16 +7,24 @@ https://docs.google.com/spreadsheets/d/1XQJovlWFOaad1_bkNsqT0VvluUiznTj9TqH80cHh
 
 2. wired the Esp32 to the reader
 Wiring (ESP32 <-> RC522, SPI)
+
 RC522 Pin	    ESP32 Pin
+
 SDA (SS)    	GPIO 5
+
 SCK          	GPIO 18
+
 MOSI	        GPIO 23
+
 MISO        	GPIO 19
+
 RST          	GPIO 22
+
 3.3V        	3.3V
+
 GND           GND
 
-3. flashed the code in the esp32 that fetchs from the google document.
+4. flashed the code in the esp32 that fetchs from the google document.
 
 Next steps.
 1. Graham should:
