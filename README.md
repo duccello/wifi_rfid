@@ -2,7 +2,7 @@
 
 So far we:
 
-0. Set up a google document that allows GET requests to fetch a Json file with our data.
+1. Set up a google document that allows GET requests to fetch a Json file with our data.
 https://docs.google.com/spreadsheets/d/1XQJovlWFOaad1_bkNsqT0VvluUiznTj9TqH80cHhJdY/edit?gid=0#gid=0
 
 2. wired the Esp32 to the reader
@@ -24,7 +24,7 @@ RST          	GPIO 22
 
 GND           GND
 
-4. flashed the code in the esp32 that fetchs from the google document.
+3. flashed the code in the esp32 that fetchs from the google document.
 
 So, at the moment, it successfully reads the NFCs and shows on the Serial Monitor the information about the different members.
 -----------------------------------------------------------------------------------------------------------
