@@ -33,20 +33,22 @@ Next steps.
 
 Graham:
 
-open the Apps Scrip (in extensions) of the fablab's google document and apply the code found in AppsScript_doGet.gs
-The google document should match the column names:
-UID	Name	Onboarding	Laser	Cnc	Bambu
+1. open the Apps Scrip (in extensions) of the fablab's google document and apply the code found in AppsScript_doGet.gs.
+2. Change the google document to match the column names:
+   
+  UID	  Name	Onboarding  	Laser  	Cnc  	Bambu
 
 Code:
 
-The .ino file should be updated to the one new App Script.
-Adding a UI tbat communicates with an encoder/buttons and screen.
+1. The .ino file should be updated to the one new App Script.
+2. Adding a UI tbat communicates with an encoder/buttons and screen.
 
 Hardware:
 
-Install the screen and buttons 
+1. Install screen
+2. Install buttons 
 
-Other:
+3D:
 
-3d case
-3d design for NFCs
+1. Case
+2. Design for NFCs
