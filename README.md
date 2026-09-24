@@ -30,18 +30,23 @@ So, at the moment, it successfully reads the NFCs and shows on the Serial Monito
 -----------------------------------------------------------------------------------------------------------
 
 Next steps.
+
 Graham:
+
 open the Apps Scrip (in extensions) of the fablab's google document and apply the code found in AppsScript_doGet.gs
 The google document should match the column names:
 UID	Name	Onboarding	Laser	Cnc	Bambu
 
 Code:
+
 The .ino file should be updated to the one new App Script.
 Adding a UI tbat communicates with an encoder/buttons and screen.
 
 Hardware:
+
 Install the screen and buttons 
 
 Other:
+
 3d case
 3d design for NFCs
