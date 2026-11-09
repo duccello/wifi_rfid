@@ -1,16 +1,3 @@
-/*
-  Smart FabLab Access Terminal — Step 5
-  Local member cache: fetches the full member list from Apps Script
-  periodically (and once at boot) instead of per-tag-scan.
-
-  Tag scans now do an instant LOCAL lookup -> no HTTP wait, and scans
-  still work even if WiFi/Apps Script is briefly slow or unreachable
-  (as long as a cache refresh has succeeded at least once since boot).
-
-  Wiring: same as Step 4 (RC522 + LCD + 2 buttons, see 04_lcd_buttons_permissions.ino)
-  Libraries required: MFRC522, ArduinoJson, LiquidCrystal (built-in)
-*/
-
 #include <WiFi.h>
 #include <SPI.h>
 #include <MFRC522.h>
@@ -19,11 +6,11 @@
 #include <LiquidCrystal.h>
 
 // ---------- WiFi credentials ----------
-const char* WIFI_SSID     = "FabLab_Public";
-const char* WIFI_PASSWORD = "FabulousLab42!";
+const char* WIFI_SSID     = "";
+const char* WIFI_PASSWORD = "";
 
 // ---------- Apps Script Web App deployment URL ----------
-const char* APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbytU_OhDVvrZRdS92Yn5rdMq6Fp9AXurr3d93zO5jzZAF_N2YmFDod3iel7qRNFwKZi/exec";
+const char* APPS_SCRIPT_URL = "";
 
 // ---------- RC522 pins ----------
 #define RST_PIN 22
@@ -41,8 +28,8 @@ const unsigned long DEBOUNCE_MS = 50;
 
 // ---------- Timing ----------
 const unsigned long IDLE_TIMEOUT_MS   = 15000;
-const unsigned long REFRESH_INTERVAL_MS = 5UL * 60UL * 1000UL; // 5 minutes, once cache is healthy
-const unsigned long RETRY_INTERVAL_MS   = 15UL * 1000UL;       // 15s, while cache has never succeeded
+const unsigned long REFRESH_INTERVAL_MS = 5UL * 60UL * 1000UL;
+const unsigned long RETRY_INTERVAL_MS   = 15UL * 1000UL;
 unsigned long lastActivity = 0;
 unsigned long lastRefreshAttempt = 0;
 unsigned long lastSuccessfulRefresh = 0; // 0 = never succeeded
