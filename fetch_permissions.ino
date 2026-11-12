@@ -12,21 +12,30 @@
 */
 
 #include <WiFi.h>
+#include <WiFiMulti.h>
 #include <SPI.h>
 #include <MFRC522.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include <LiquidCrystal.h>
 
-// ---------- WiFi credentials ----------
-const char* WIFI_SSID     = "";
-const char* WIFI_PASSWORD = "";
+// ---------- WiFi networks ----------
+// Every place the terminal may be installed; the list is in secrets.h.
+// The ESP32 joins the strongest one in range.
+struct WifiNetwork {
+  const char* ssid;
+  const char* password;
+};
+
+#include "secrets.h"
+
+WiFiMulti wifiMulti;
 
 // ---------- Apps Script Web App deployment URL ----------
-const char* APPS_SCRIPT_URL = "";
+const char* APPS_SCRIPT_URL = APPS_SCRIPT_URL_VALUE;
 
 // Must match REGISTER_TOKEN in the Apps Script
-const char* REGISTER_TOKEN = "change-me-fablab";
+const char* REGISTER_TOKEN  = REGISTER_TOKEN_VALUE;
 const char* UNKNOWN_NAME   = "NEW USER";
 
 // ---------- RC522 pins ----------
@@ -102,6 +111,10 @@ void setup() {
   lcd.setCursor(0, 0);
   lcd.print("Starting up...");
 
+  WiFi.mode(WIFI_STA);
+  for (const WifiNetwork &net : WIFI_NETWORKS) {
+    wifiMulti.addAP(net.ssid, net.password);
+  }
   connectToWiFi();
   refreshCache(); // initial load so the terminal is usable immediately
 
@@ -410,11 +423,12 @@ void showPage(int page) {
 // ---------- Helpers ----------
 
 void connectToWiFi() {
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  unsigned long startAttempt = millis();
-  while (WiFi.status() != WL_CONNECTED && millis() - startAttempt < 15000) {
-    delay(300);
+  // Scans, then joins the strongest known network (waits up to 15s)
+  if (wifiMulti.run(15000) == WL_CONNECTED) {
+    Serial.print("WiFi connected: ");
+    Serial.println(WiFi.SSID());
+  } else {
+    Serial.println("No known WiFi in range.");
   }
 }
 

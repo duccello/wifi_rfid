@@ -4,8 +4,9 @@ So far we:
 
 1. Set up a Google Sheet + Apps Script that returns our member data as JSON,
    both for single lookups and as a full bulk export (used to build a local
-   cache on the ESP32 — see step 4).
-   https://docs.google.com/spreadsheets/d/1XQJovlWFOaad1_bkNsqT0VvluUiznTj9TqH80cHhJdY/edit?gid=0#gid=0
+   cache on the ESP32 — see step 4). The sheet link isn't published here;
+   ask the team for it. The Apps Script URL, WiFi credentials and register
+   token go in `secrets.h`: copy `secrets.example.h` and fill in your own values.
 
 2. Wired the ESP32 to the RFID reader.
 
