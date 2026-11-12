@@ -19,8 +19,8 @@
 #include <LiquidCrystal.h>
 
 // ---------- WiFi credentials ----------
-const char* WIFI_SSID     = "FabLab_Public";
-const char* WIFI_PASSWORD = "FabulousLab42!";
+const char* WIFI_SSID     = "";
+const char* WIFI_PASSWORD = "";
 
 // ---------- Apps Script Web App deployment URL ----------
 const char* APPS_SCRIPT_URL = "";
