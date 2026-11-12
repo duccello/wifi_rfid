@@ -23,7 +23,7 @@ const char* WIFI_SSID     = "FabLab_Public";
 const char* WIFI_PASSWORD = "FabulousLab42!";
 
 // ---------- Apps Script Web App deployment URL ----------
-const char* APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxUJGQ5MDAPxy8sVKXnYn48vs6k6Isa3TsmQqjEBrAV0Tm9yYAqf0J_kdTX4nozNi9-kw/exec";
+const char* APPS_SCRIPT_URL = "";
 
 // Must match REGISTER_TOKEN in the Apps Script
 const char* REGISTER_TOKEN = "change-me-fablab";
