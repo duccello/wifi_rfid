@@ -1,3 +1,16 @@
+/*
+  Smart FabLab Access Terminal — Step 5
+  Local member cache: fetches the full member list from Apps Script
+  periodically (and once at boot) instead of per-tag-scan.
+
+  Tag scans now do an instant LOCAL lookup -> no HTTP wait, and scans
+  still work even if WiFi/Apps Script is briefly slow or unreachable
+  (as long as a cache refresh has succeeded at least once since boot).
+
+  Wiring: same as Step 4 (RC522 + LCD + 2 buttons, see 04_lcd_buttons_permissions.ino)
+  Libraries required: MFRC522, ArduinoJson, LiquidCrystal (built-in)
+*/
+
 #include <WiFi.h>
 #include <SPI.h>
 #include <MFRC522.h>
@@ -6,11 +19,15 @@
 #include <LiquidCrystal.h>
 
 // ---------- WiFi credentials ----------
-const char* WIFI_SSID     = "";
-const char* WIFI_PASSWORD = "";
+const char* WIFI_SSID     = "FabLab_Public";
+const char* WIFI_PASSWORD = "FabulousLab42!";
 
 // ---------- Apps Script Web App deployment URL ----------
-const char* APPS_SCRIPT_URL = "";
+const char* APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxUJGQ5MDAPxy8sVKXnYn48vs6k6Isa3TsmQqjEBrAV0Tm9yYAqf0J_kdTX4nozNi9-kw/exec";
+
+// Must match REGISTER_TOKEN in the Apps Script
+const char* REGISTER_TOKEN = "change-me-fablab";
+const char* UNKNOWN_NAME   = "NEW USER";
 
 // ---------- RC522 pins ----------
 #define RST_PIN 22
@@ -28,8 +45,8 @@ const unsigned long DEBOUNCE_MS = 50;
 
 // ---------- Timing ----------
 const unsigned long IDLE_TIMEOUT_MS   = 15000;
-const unsigned long REFRESH_INTERVAL_MS = 5UL * 60UL * 1000UL;
-const unsigned long RETRY_INTERVAL_MS   = 15UL * 1000UL;
+const unsigned long REFRESH_INTERVAL_MS = 5UL * 60UL * 1000UL; // 5 minutes, once cache is healthy
+const unsigned long RETRY_INTERVAL_MS   = 15UL * 1000UL;       // 15s, while cache has never succeeded
 unsigned long lastActivity = 0;
 unsigned long lastRefreshAttempt = 0;
 unsigned long lastSuccessfulRefresh = 0; // 0 = never succeeded
@@ -199,6 +216,63 @@ ActiveMember lookupMember(const String &uid) {
   return result; // found stays false
 }
 
+// Asks Apps Script to append a placeholder row (name "NEW USER", all FALSE)
+// for an unknown UID. On success, also adds it to the local cache so
+// tapping the same tag again doesn't trigger another registration.
+bool registerUnknownTag(const String &uid) {
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("Register skipped: WiFi not connected.");
+    return false;
+  }
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Registering...");
+
+  HTTPClient http;
+  String url = String(APPS_SCRIPT_URL) + "?mode=register&uid=" + urlEncode(uid) +
+               "&token=" + urlEncode(String(REGISTER_TOKEN));
+  http.begin(url);
+  http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+  http.setTimeout(15000);
+
+  int httpCode = http.GET();
+  if (httpCode != HTTP_CODE_OK) {
+    Serial.print("Register failed, HTTP code: ");
+    Serial.println(httpCode);
+    http.end();
+    return false;
+  }
+
+  String payload = http.getString();
+  http.end();
+
+  JsonDocument doc;
+  if (deserializeJson(doc, payload)) {
+    Serial.println("Register failed: bad JSON response.");
+    return false;
+  }
+  if (!(doc["ok"] | false)) {
+    Serial.println("Register rejected by Apps Script (check token).");
+    return false;
+  }
+
+  // Mirror the new row into the local cache
+  if (cacheCount < MAX_MEMBERS) {
+    cache[cacheCount].uid        = uid;
+    cache[cacheCount].name       = UNKNOWN_NAME;
+    cache[cacheCount].onboarding = false;
+    cache[cacheCount].laser      = false;
+    cache[cacheCount].cnc        = false;
+    cache[cacheCount].bambu      = false;
+    cacheCount++;
+  }
+
+  Serial.print("Registered new tag in sheet: ");
+  Serial.println(uid);
+  return true;
+}
+
 // ---------- NFC ----------
 
 void checkForTag() {
@@ -210,6 +284,13 @@ void checkForTag() {
   Serial.println(uidString);
 
   member = lookupMember(uidString); // local lookup, no HTTP wait
+
+  // Unknown tag -> add a placeholder row to the sheet for an admin to complete
+  if (!member.found && lastSuccessfulRefresh != 0) {
+    if (registerUnknownTag(uidString)) {
+      member = lookupMember(uidString); // now found, as "NEW USER" with all permissions NO
+    }
+  }
 
   state = STATE_ACTIVE;
   currentPage = 1;
@@ -348,3 +429,18 @@ String getUidString(byte *buffer, byte bufferSize) {
   return result;
 }
 
+// Minimal URL-encoder for query params (turns ':' into %3A, etc.)
+String urlEncode(const String &str) {
+  String encoded = "";
+  char buf[4];
+  for (unsigned int i = 0; i < str.length(); i++) {
+    char c = str.charAt(i);
+    if (isalnum(c)) {
+      encoded += c;
+    } else {
+      sprintf(buf, "%%%02X", c);
+      encoded += buf;
+    }
+  }
+  return encoded;
+}
